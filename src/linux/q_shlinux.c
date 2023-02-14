@@ -74,12 +74,14 @@ int Hunk_End (void)
 {
 	byte *n;
 
-	n = realloc(membase, curhunksize);
-	if (n != membase)
-		Sys_Error("Hunk_End:  Could not remap virtual block (%d)", errno);
+	n = realloc(membase, maxhunksize);
+	if (n != membase) {
+		Sys_Error("Hunk_End: could not remap virtual block (%d)", errno);
+	}
 
-	return curhunksize;
+	return maxhunksize;
 }
+
 void Hunk_Free (void *base)
 {
 	if (base)

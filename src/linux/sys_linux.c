@@ -105,19 +105,18 @@ void Sys_Error (const char *error, ...)
     va_list     argptr;
     char        string[1024];
 
-// change stdin to non blocking
+	// change stdin to non blocking
     fcntl (0, F_SETFL, fcntl (0, F_GETFL, 0) & ~FNDELAY);
-
-	CL_Shutdown ();
-	Qcommon_Shutdown ();
     
     va_start (argptr,error);
     vsnprintf (string,sizeof(string),error,argptr);
     va_end (argptr);
 	fprintf(stderr, "Error: %s\n", string);
 
-	_exit (1);
+	CL_Shutdown ();
+	Qcommon_Shutdown ();
 
+	_exit (1);
 } 
 
 void Sys_Warn (char *warning, ...)
@@ -298,7 +297,7 @@ void Sys_SendKeyEvents (void)
 /*****************************************************************************/
 
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 int main (int argc, char *argv[])
 {

@@ -2,3 +2,4 @@
 bin/quake2
 bin/game.so
 *.o
+.vscode/c_cpp_properties.json
