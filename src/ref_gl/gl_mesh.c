@@ -460,8 +460,7 @@ void R_DrawAliasModel (model_t *model)
 
 	char const prefix[] = "models/weapons/";
 	if (strncmp(prefix, model->name, strlen(prefix)) == 0) {
-		frame->translate[1] = frame->mins[1] + frame->maxs[1];
-		frame->translate[1] = frame->translate[1] / 2;
+		frame->translate[1] = frame->mins[1] / 2;
 	}
 
 	if (currententity->flags & RF_WEAPONMODEL)
