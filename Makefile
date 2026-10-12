@@ -71,6 +71,7 @@ QUAKE2_OBJS = \
 	src/client/cl_ents.o \
 	src/client/cl_fx.o \
 	src/client/cl_http.o \
+	src/client/cl_ads.o \
 	src/client/cl_input.o \
 	src/client/cl_inv.o \
 	src/client/cl_loc.o \

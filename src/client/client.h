@@ -628,9 +628,21 @@ typedef struct
 
 extern 	kbutton_t 	in_strafe;
 extern 	kbutton_t 	in_speed;
+extern 	kbutton_t 	in_ads;
+
+extern	float		cl_ads_frac;
 
 void CL_InitInput (void);
 void CL_SendCmd (void);
+
+void CL_InitAds (void);
+void CL_UpdateAds (void);
+void CL_AdsReset (void);
+void CL_AdsApplyView (void);
+void CL_AdsGunOffset (float base_x, float base_y, float base_z, float *x, float *y, float *z);
+float CL_AdsBobScale (void);
+float CL_AdsLookScale (void);
+qboolean CL_AdsForceCenterWeapon (void);
 
 void CL_ClearState (void);
 

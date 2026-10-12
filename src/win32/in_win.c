@@ -623,6 +623,12 @@ void IN_MouseMove (usercmd_t *cmd)
 		mouse_y *= sensitivity->value;
 	}
 
+	{
+		float adsScale = CL_AdsLookScale();
+		mouse_x *= adsScale;
+		mouse_y *= adsScale;
+	}
+
 	if (m_autosens->integer)
 	{
 		mouse_x *= cl.refdef.fov_x/90.0f;

@@ -427,9 +427,40 @@ static void GL_SetShadeLight(void)
 }
 
 /*
+==============
+R_WeaponCenterShiftY
+
+Lateral shift that puts the viewmodel's true Y bounds on the screen center.
+Does not mutate the loaded MD2 frame.
+==============
+*/
+static float R_WeaponCenterShiftY(const model_t *model, const aliasFrame_t *frame, int frameIdx)
+{
+	const aliasModel_t *paliashdr = model->aliasModel;
+	const aliasMesh_t *mesh;
+	float ymin = 99999.0f, ymax = -99999.0f;
+	int i, m;
+
+	for (m = 0, mesh = paliashdr->meshes; m < paliashdr->numMeshes; m++, mesh++) {
+		const aliasVertex_t *v = mesh->vertexes + frameIdx * mesh->numVerts;
+		for (i = 0; i < mesh->numVerts; i++) {
+			float y = v[i].point[1] * frame->scale[1] + frame->translate[1];
+			if (y < ymin)
+				ymin = y;
+			if (y > ymax)
+				ymax = y;
+		}
+	}
+
+	if (ymax < ymin)
+		return 0.0f;
+
+	return -0.5f * (ymin + ymax);
+}
+
+/*
 =================
 R_DrawAliasModel
-
 =================
 */
 void R_DrawAliasModel (model_t *model)
@@ -441,6 +472,7 @@ void R_DrawAliasModel (model_t *model)
 	vec_t			backlerp, frontlerp;
 	int				oldframeIdx, newframeIdx;
 	float			sy, cy, sr;
+	float			trans1, oldtrans1;
 
 	paliashdr = model->aliasModel;
 
@@ -457,16 +489,19 @@ void R_DrawAliasModel (model_t *model)
 
 	frame = paliashdr->frames + newframeIdx;
 	oldframe = paliashdr->frames + oldframeIdx;
-
-	char const prefix[] = "models/weapons/";
-	if (strncmp(prefix, model->name, strlen(prefix)) == 0) {
-		frame->translate[1] = frame->mins[1] / 2;
-	}
+	trans1 = frame->translate[1];
+	oldtrans1 = oldframe->translate[1];
 
 	if (currententity->flags & RF_WEAPONMODEL)
 	{
-		if ( r_lefthand->integer == 2 )
+		if ( r_lefthand->integer == 2 && cl_ads_frac <= 0.01f )
 			return;
+
+		/* Hip-fire keeps the original Q2 offset; ADS eases to true center. */
+		if (cl_ads_frac > 0.0f) {
+			trans1 += R_WeaponCenterShiftY(model, frame, newframeIdx) * cl_ads_frac;
+			oldtrans1 += R_WeaponCenterShiftY(model, oldframe, oldframeIdx) * cl_ads_frac;
+		}
 	}
 	else if ( R_CullAliasModel( frame, oldframe ) )
 		return;
@@ -509,11 +544,11 @@ void R_DrawAliasModel (model_t *model)
 	// move should be the delta back to the previous frame * backlerp
 	VectorSubtract (currententity->oldorigin, currententity->origin, delta);
 	move[0] = DotProduct(currententity->axis[0],delta) + oldframe->translate[0];
-	move[1] = DotProduct(currententity->axis[1],delta) + oldframe->translate[1];
+	move[1] = DotProduct(currententity->axis[1],delta) + oldtrans1;
 	move[2] = DotProduct(currententity->axis[2],delta) + oldframe->translate[2];
 
 	move[0] = backlerp*move[0] + frontlerp*frame->translate[0];
-	move[1] = backlerp*move[1] + frontlerp*frame->translate[1];
+	move[1] = backlerp*move[1] + frontlerp*trans1;
 	move[2] = backlerp*move[2] + frontlerp*frame->translate[2];
 
 	if (newframeIdx == oldframeIdx)

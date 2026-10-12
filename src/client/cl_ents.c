@@ -1158,14 +1158,21 @@ static void CL_AddViewWeapon (const player_state_t *ps, const player_state_t *op
 		return;
 
 	// set up gun position
-	for (i=0 ; i<3 ; i++) {
-		gun.origin[i] = cl.refdef.vieworg[i] + ops->gunoffset[i] + cl.lerpfrac * (ps->gunoffset[i] - ops->gunoffset[i]);
-		gun.angles[i] = cl.refdef.viewangles[i] + LerpAngle (ops->gunangles[i], ps->gunangles[i], cl.lerpfrac);
-	}
+	{
+		float gun_x, gun_y, gun_z, bob;
 
-	VectorMA( gun.origin, cl_gun_y->value, cl.v_forward, gun.origin );
-	VectorMA( gun.origin, cl_gun_x->value, cl.v_right, gun.origin );
-	VectorMA( gun.origin, (cl_gun_z->value+fovOffset), cl.v_up, gun.origin );
+		bob = CL_AdsBobScale();
+		for (i=0 ; i<3 ; i++) {
+			gun.origin[i] = cl.refdef.vieworg[i] + ops->gunoffset[i] + cl.lerpfrac * (ps->gunoffset[i] - ops->gunoffset[i]);
+			gun.angles[i] = cl.refdef.viewangles[i] + LerpAngle (ops->gunangles[i], ps->gunangles[i], cl.lerpfrac) * bob;
+		}
+
+		CL_AdsGunOffset(cl_gun_x->value, cl_gun_y->value, cl_gun_z->value + fovOffset,
+			&gun_x, &gun_y, &gun_z);
+		VectorMA( gun.origin, gun_y, cl.v_forward, gun.origin );
+		VectorMA( gun.origin, gun_x, cl.v_right, gun.origin );
+		VectorMA( gun.origin, gun_z, cl.v_up, gun.origin );
+	}
 
 	gun.frame = ps->gunframe;
 	if (gun.frame == 0)
@@ -1181,7 +1188,7 @@ static void CL_AddViewWeapon (const player_state_t *ps, const player_state_t *op
 
 #ifdef GL_QUAKE
 	AnglesToAxis(gun.angles, gun.axis);
-	if (info_hand->integer == 1) {
+	if (info_hand->integer == 1 && !CL_AdsForceCenterWeapon()) {
 		gun.flags |= RF_CULLHACK;
 		VectorInverse (gun.axis[1]);
 	}
@@ -1313,6 +1320,7 @@ static void CL_CalcViewValues (void)
 
 	// interpolate field of view
 	cl.refdef.fov_x = ops->fov + lerp * (ps->fov - ops->fov);
+	CL_AdsApplyView();
 
 	// don't interpolate blend color
 	Vector4Copy (ps->blend, cl.refdef.blend);

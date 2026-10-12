@@ -81,7 +81,7 @@ Key_Event (int key, qboolean down, unsigned time);
 static kbutton_t	in_klook;
 static kbutton_t	in_left, in_right, in_forward, in_back;
 static kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
-kbutton_t	in_strafe, in_speed, in_use, in_attack;
+kbutton_t	in_strafe, in_speed, in_use, in_attack, in_ads;
 static kbutton_t	in_up, in_down;
 
 static int			in_impulse;
@@ -198,6 +198,13 @@ static void IN_AttackDown(void) {
     }
 }
 static void IN_AttackUp(void) {KeyUp(&in_attack);}
+
+static void IN_AdsDown(void) {
+	KeyDown(&in_ads);
+	if (cl_instantpacket->integer)
+		cl.sendPacketNow = true;
+}
+static void IN_AdsUp(void) {KeyUp(&in_ads);}
 
 static void IN_UseDown (void) {
 	KeyDown(&in_use);
@@ -487,6 +494,8 @@ void CL_UpdateCmd( int msec )
 	// allow mice or other external controllers to add to the move
 	IN_Move(&cl.cmd);
 
+	CL_UpdateAds();
+
 	// update cmd viewangles for CL_PredictMove
 	CL_ClampPitch ();
 
@@ -578,6 +587,10 @@ void CL_InitInput (void)
 	Cmd_AddCommand ("-speed", IN_SpeedUp);
 	Cmd_AddCommand ("+attack", IN_AttackDown);
 	Cmd_AddCommand ("-attack", IN_AttackUp);
+	Cmd_AddCommand ("+ads", IN_AdsDown);
+	Cmd_AddCommand ("-ads", IN_AdsUp);
+	Cmd_AddCommand ("+centerweapon", IN_AdsDown);
+	Cmd_AddCommand ("-centerweapon", IN_AdsUp);
 	Cmd_AddCommand ("+use", IN_UseDown);
 	Cmd_AddCommand ("-use", IN_UseUp);
 	Cmd_AddCommand ("impulse", IN_Impulse);
@@ -586,6 +599,8 @@ void CL_InitInput (void)
 
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
 	cl_maxpackets = Cvar_Get( "cl_maxpackets", "0", 0 );
+
+	CL_InitAds();
 }
 
 /*
