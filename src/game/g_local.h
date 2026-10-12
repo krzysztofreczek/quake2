@@ -338,6 +338,10 @@ typedef struct
 	int			body_que;			// dead bodies
 
 	int			power_cubes;		// ugly necessity for coop
+
+	float		frametime;			// physics dt (FRAMETIME * focus_scale)
+	float		focus_frac;			// 0 = normal, 1 = full focus
+	float		focus_scale;		// world timescale
 } level_locals_t;
 
 
@@ -806,6 +810,12 @@ void M_ChangeYaw (edict_t *ent);
 void G_RunEntity (edict_t *ent);
 
 //
+// g_focus.c
+//
+void G_InitFocus (void);
+void G_UpdateFocus (void);
+
+//
 // g_main.c
 //
 void SaveClientData (void);
@@ -964,6 +974,8 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+
+	qboolean	focus_held;
 };
 
 

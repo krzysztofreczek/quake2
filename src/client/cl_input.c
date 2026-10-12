@@ -81,7 +81,7 @@ Key_Event (int key, qboolean down, unsigned time);
 static kbutton_t	in_klook;
 static kbutton_t	in_left, in_right, in_forward, in_back;
 static kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
-kbutton_t	in_strafe, in_speed, in_use, in_attack, in_ads;
+kbutton_t	in_strafe, in_speed, in_use, in_attack, in_ads, in_focus;
 static kbutton_t	in_up, in_down;
 
 static int			in_impulse;
@@ -205,6 +205,13 @@ static void IN_AdsDown(void) {
 		cl.sendPacketNow = true;
 }
 static void IN_AdsUp(void) {KeyUp(&in_ads);}
+
+static void IN_FocusDown(void) {
+	KeyDown(&in_focus);
+	if (cl_instantpacket->integer)
+		cl.sendPacketNow = true;
+}
+static void IN_FocusUp(void) {KeyUp(&in_focus);}
 
 static void IN_UseDown (void) {
 	KeyDown(&in_use);
@@ -495,6 +502,7 @@ void CL_UpdateCmd( int msec )
 	IN_Move(&cl.cmd);
 
 	CL_UpdateAds();
+	CL_UpdateFocus();
 
 	// update cmd viewangles for CL_PredictMove
 	CL_ClampPitch ();
@@ -530,7 +538,10 @@ void CL_FinalizeCmd (void)
 
 	CL_BaseMove(&cl.cmd);
 
-	cl.cmd.impulse = in_impulse;
+	if (in_impulse)
+		cl.cmd.impulse = in_impulse;
+	else if ((in_focus.state & 1) && cls.key_dest == key_game)
+		cl.cmd.impulse = IMPULSE_FOCUS;
 	in_impulse = 0;
 
 	// set the ambient light level at the player's current position
@@ -591,6 +602,8 @@ void CL_InitInput (void)
 	Cmd_AddCommand ("-ads", IN_AdsUp);
 	Cmd_AddCommand ("+centerweapon", IN_AdsDown);
 	Cmd_AddCommand ("-centerweapon", IN_AdsUp);
+	Cmd_AddCommand ("+focus", IN_FocusDown);
+	Cmd_AddCommand ("-focus", IN_FocusUp);
 	Cmd_AddCommand ("+use", IN_UseDown);
 	Cmd_AddCommand ("-use", IN_UseUp);
 	Cmd_AddCommand ("impulse", IN_Impulse);
@@ -601,6 +614,7 @@ void CL_InitInput (void)
 	cl_maxpackets = Cvar_Get( "cl_maxpackets", "0", 0 );
 
 	CL_InitAds();
+	CL_InitFocus();
 }
 
 /*

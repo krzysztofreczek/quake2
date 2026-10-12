@@ -876,7 +876,7 @@ void CL_ParticleEffect (const vec3_t org, const vec3_t dir, int color, int count
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = color + (rand()&7);
 
 		d = rand()&31;
@@ -916,7 +916,7 @@ void CL_ParticleEffect2 (const vec3_t org, const vec3_t dir, int color, int coun
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = color;
 
 		d = rand()&7;
@@ -957,7 +957,7 @@ void CL_ParticleEffect3 (const vec3_t org, const vec3_t dir, int color, int coun
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = color;
 
 		d = rand()&7;
@@ -995,7 +995,7 @@ void CL_TeleporterParticles (const entity_state_t *ent)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = 0xdb;
 
 		p->org[0] = ent->origin[0] - 16 + (rand()&31);
@@ -1035,7 +1035,7 @@ void CL_LogoutEffect (const vec3_t org, int type)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		if (type == MZ_LOGIN)
 			p->color = 0xd0 + (rand()&7);	// green
@@ -1087,7 +1087,7 @@ void CL_ItemRespawnParticles (const vec3_t org)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->color = 0xd4 + (rand()&3);	// green
 
@@ -1126,7 +1126,7 @@ void CL_ExplosionParticles (const vec3_t org)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = 0xe0 + (rand()&7);
 
 		p->org[0] = org[0] + ((rand()%32)-16);
@@ -1166,7 +1166,7 @@ void CL_BigTeleportParticles (const vec3_t org)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->color = colortable[rand()&3];
 
@@ -1213,7 +1213,7 @@ void CL_BlasterParticles (const vec3_t org, const vec3_t dir)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = 0xe0 + (rand()&7);
 
 		d = rand()&15;
@@ -1265,7 +1265,7 @@ void CL_BlasterTrail (const vec3_t start, const vec3_t end)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (0.3f+frand()*0.2f);
@@ -1313,7 +1313,7 @@ void CL_QuadTrail (const vec3_t start, const vec3_t end)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (0.8f+frand()*0.2f);
@@ -1361,7 +1361,7 @@ void CL_FlagTrail (const vec3_t start, const vec3_t end, float color)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (0.8f+frand()*0.2f);
@@ -1430,7 +1430,7 @@ void CL_DiminishingTrail (const vec3_t start, const vec3_t end, centity_t *old, 
 			active_particles = p;
 			VectorClear (p->accel);
 		
-			p->time = cl.time;
+			p->time = cl_focus_time;
 
 			if (flags & EF_GIB)
 			{
@@ -1520,7 +1520,7 @@ void CL_RocketTrail (const vec3_t start, const vec3_t end, centity_t *old)
 			active_particles = p;
 			
 			VectorClear (p->accel);
-			p->time = cl.time;
+			p->time = cl_focus_time;
 
 			p->alpha = 1.0f;
 			p->alphavel = -1.0f / (1.0f+frand()*0.2f);
@@ -1583,7 +1583,7 @@ void CL_RailTrail (const vec3_t start, const vec3_t end)
 		p->next = active_particles;
 		active_particles = p;
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		VectorClear (p->accel);
 
 		Q_sincos(i * 0.1f, &s, &c);
@@ -1620,7 +1620,7 @@ void CL_RailTrail (const vec3_t start, const vec3_t end)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		VectorClear (p->accel);
 
 		p->alpha = 1.0f;
@@ -1670,7 +1670,7 @@ void CL_IonripperTrail (const vec3_t start, const vec3_t ent)
 		active_particles = p;
 		VectorClear (p->accel);
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->alpha = 0.5f;
 		p->alphavel = -1.0f / (0.3f + frand() * 0.2f);
 		p->color = 0xe4 + (rand()&3);
@@ -1726,7 +1726,7 @@ void CL_BubbleTrail (const vec3_t start, const vec3_t end)
 		active_particles = p;
 
 		VectorClear (p->accel);
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (1.0f+frand()*0.2f);
@@ -1795,7 +1795,7 @@ void CL_FlyParticles (const vec3_t origin, int count)
 		forward[1] = cp*sy;
 		forward[2] = -sp;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		dist = (float)sin(ltime + i)*64.0f;
 		p->org[0] = origin[0] + bytedirs[i][0]*dist + forward[0]*BEAMLENGTH;
@@ -1886,7 +1886,7 @@ void CL_BfgParticles (const entity_t *ent)
 		forward[1] = cp*sy;
 		forward[2] = -sp;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		dist = (float)sin(ltime + i)*64.0f;
 		p->org[0] = ent->origin[0] + bytedirs[i][0]*dist + forward[0]*BEAMLENGTH;
@@ -1947,7 +1947,7 @@ void CL_TrapParticles (entity_t *ent)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (0.3f+frand()*0.2f);
@@ -1975,7 +1975,7 @@ void CL_TrapParticles (entity_t *ent)
 				p->next = active_particles;
 				active_particles = p;
 
-				p->time = cl.time;
+				p->time = cl_focus_time;
 				p->color = 0xe0 + (rand()&3);
 
 				p->alpha = 1.0f;
@@ -2021,7 +2021,7 @@ void CL_BFGExplosionParticles (const vec3_t org)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = 0xd0 + (rand()&7);
 
 		for (j=0 ; j<3 ; j++)
@@ -2063,7 +2063,7 @@ void CL_TeleportParticles (const vec3_t org)
 				p->next = active_particles;
 				active_particles = p;
 
-				p->time = cl.time;
+				p->time = cl_focus_time;
 				p->color = 7 + (rand()&7);
 
 				p->alpha = 1.0f;
@@ -2101,7 +2101,7 @@ void CL_AddParticles (void)
 	cparticle_t		*active = NULL, *tail = NULL;
 	particle_t		part;
 
-	cltime = (float)cl.time;
+	cltime = cl_focus_time;
 
 	for (p=active_particles ; p ; p=next)
 	{

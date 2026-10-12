@@ -1709,6 +1709,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	client->buttons = ucmd->buttons;
 	client->latched_buttons |= client->buttons & ~client->oldbuttons;
 
+	if (ucmd->impulse == IMPULSE_FOCUS)
+		client->focus_held = true;
+	else if (ucmd->impulse == 0)
+		client->focus_held = false;
+
 	// save light level the player is standing on for
 	// monster sighting AI
 	ent->light_level = ucmd->lightlevel;

@@ -387,7 +387,7 @@ void ExitLevel (void)
 ================
 G_RunFrame
 
-Advances the world by 0.1 seconds
+Advances the world by level.frametime seconds
 ================
 */
 void G_RunFrame (void)
@@ -395,8 +395,10 @@ void G_RunFrame (void)
 	int		i;
 	edict_t	*ent;
 
+	G_UpdateFocus();
+
 	level.framenum++;
-	level.time = level.framenum*FRAMETIME;
+	level.time += level.frametime;
 
 	// choose a client for monsters to target this frame
 	AI_SetSightClient ();

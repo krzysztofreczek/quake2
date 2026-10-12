@@ -876,6 +876,8 @@ typedef struct
 #define	BUTTON_USE			2
 #define	BUTTON_ANY			128			// any key whatsoever
 
+#define IMPULSE_FOCUS		200			// hold-to-focus (world time dilation)
+
 
 // usercmd_t is sent to the server each client frame
 typedef struct usercmd_s

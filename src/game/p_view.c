@@ -481,6 +481,9 @@ void SV_CalcBlend (edict_t *ent)
 	if (ent->client->bonus_alpha > 0)
 		SV_AddBlend (0.85, 0.7, 0.3, ent->client->bonus_alpha, ent->client->ps.blend);
 
+	if (level.focus_frac > 0.0f)
+		SV_AddBlend (0.45f, 0.04f, 0.02f, 0.14f * level.focus_frac, ent->client->ps.blend);
+
 	// drop the damage value
 	ent->client->damage_alpha -= 0.06;
 	if (ent->client->damage_alpha < 0)

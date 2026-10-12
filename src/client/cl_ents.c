@@ -1320,6 +1320,7 @@ static void CL_CalcViewValues (void)
 
 	// interpolate field of view
 	cl.refdef.fov_x = ops->fov + lerp * (ps->fov - ops->fov);
+	CL_FocusApplyView();
 	CL_AdsApplyView();
 
 	// don't interpolate blend color

@@ -103,7 +103,7 @@ void CL_DebugTrail (const vec3_t start, const vec3_t end)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		VectorClear (p->accel);
 		VectorClear (p->vel);
 		p->alpha = 1.0f;
@@ -146,7 +146,7 @@ void CL_SmokeTrail (const vec3_t start, const vec3_t end, int colorStart, int co
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (1.0f+frand()*0.5f);
@@ -190,7 +190,7 @@ void CL_ForceWall (const vec3_t start, const vec3_t end, int color)
 			active_particles = p;
 			VectorClear (p->accel);
 			
-			p->time = cl.time;
+			p->time = cl_focus_time;
 
 			p->alpha = 1.0f;
 			p->alphavel =  -1.0f / (3.0f+frand()*0.5f);
@@ -227,7 +227,7 @@ void CL_ForceWall (const vec3_t start, const vec3_t end, int color)
 		active_particles = p;
 		
 		VectorClear (p->accel);
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0;
 		p->alphavel = -1.0 / (1+frand()*0.2);
@@ -253,7 +253,7 @@ void CL_ForceWall (const vec3_t start, const vec3_t end, int color)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0;
 		p->alphavel = -1.0 / (1+frand()*0.5);
@@ -288,7 +288,7 @@ void CL_GenericParticleEffect (const vec3_t org, const vec3_t dir, int color, in
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		if (numcolors > 1)
 			p->color = color + (rand() & numcolors);
 		else
@@ -340,7 +340,7 @@ void CL_BubbleTrail2 (const vec3_t start, const vec3_t end, int dist)
 		active_particles = p;
 
 		VectorClear (p->accel);
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (1.0f+frand()*0.1f);
@@ -408,7 +408,7 @@ void CL_Heatbeam (const vec3_t start, const vec3_t end)
 			p->next = active_particles;
 			active_particles = p;
 			
-			p->time = cl.time;
+			p->time = cl_focus_time;
 			VectorClear (p->accel);
 
 			p->alpha = 0.5;
@@ -490,7 +490,7 @@ void CL_Heatbeam (const vec3_t start, const vec3_t forward)
 			p->next = active_particles;
 			active_particles = p;
 			
-			p->time = cl.time;
+			p->time = cl_focus_time;
 			VectorClear (p->accel);
 
 			Q_sincos(rot, &s, &c);
@@ -557,7 +557,7 @@ void CL_Heatbeam (const vec3_t start, const vec3_t end)
 		p->next = active_particles;
 		active_particles = p;
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		VectorClear (p->accel);
 		
 		d = crand()*M_PI;
@@ -605,7 +605,7 @@ void CL_ParticleSteamEffect (const vec3_t org, const vec3_t dir, int color, int 
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = color + (rand()&7);
 
 		p->org[0] = org[0] + magnitude*0.1f*crand();
@@ -645,7 +645,7 @@ void CL_ParticleSteamEffect2 (cl_sustain_t *self)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = self->color + (rand()&7);
 
 		p->org[0] = self->org[0] + self->magnitude*0.1f*crand();
@@ -703,7 +703,7 @@ void CL_TrackerTrail (const vec3_t start, const vec3_t end, int particleColor)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -2.0f;
@@ -734,7 +734,7 @@ void CL_Tracker_Shell(const vec3_t origin)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
@@ -763,7 +763,7 @@ void CL_MonsterPlasma_Shell(const vec3_t origin)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
@@ -797,7 +797,7 @@ void CL_Widowbeamout (cl_sustain_t *self)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
@@ -831,7 +831,7 @@ void CL_Nukeblast (cl_sustain_t *self)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = INSTANT_PARTICLE;
@@ -860,7 +860,7 @@ void CL_WidowSplash (const vec3_t org)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = colortable[rand()&3];
 
 		VectorSet(dir, crand(), crand(), crand());
@@ -892,7 +892,7 @@ void CL_Tracker_Explode(const vec3_t origin)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f;
@@ -939,7 +939,7 @@ void CL_TagTrail (const vec3_t start, const vec3_t end, int color)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (0.8f+frand()*0.2f);
@@ -975,7 +975,7 @@ void CL_ColorExplosionParticles (const vec3_t org, int color, int run)
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = color + (rand() % run);
 
 		p->org[0] = org[0] + ((rand()%32)-16);
@@ -1016,7 +1016,7 @@ void CL_ParticleSmokeEffect (const vec3_t org, const vec3_t dir, int color, int 
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = color + (rand()&7);
 
 		p->org[0] = org[0] + magnitude*0.1f*crand();
@@ -1058,7 +1058,7 @@ void CL_BlasterParticles2 (const vec3_t org, const vec3_t dir, unsigned int colo
 		p->next = active_particles;
 		active_particles = p;
 
-		p->time = cl.time;
+		p->time = cl_focus_time;
 		p->color = color + (rand()&7);
 
 		d = rand()&15;
@@ -1112,7 +1112,7 @@ void CL_BlasterTrail2 (const vec3_t start, const vec3_t end)
 		active_particles = p;
 		VectorClear (p->accel);
 		
-		p->time = cl.time;
+		p->time = cl_focus_time;
 
 		p->alpha = 1.0f;
 		p->alphavel = -1.0f / (0.3f+frand()*0.2f);

@@ -72,6 +72,7 @@ QUAKE2_OBJS = \
 	src/client/cl_fx.o \
 	src/client/cl_http.o \
 	src/client/cl_ads.o \
+	src/client/cl_focus.o \
 	src/client/cl_input.o \
 	src/client/cl_inv.o \
 	src/client/cl_loc.o \
@@ -166,6 +167,7 @@ GAME_OBJS = \
 	src/game/g_chase.o \
 	src/game/g_cmds.o \
 	src/game/g_combat.o \
+	src/game/g_focus.o \
 	src/game/g_func.o \
 	src/game/g_items.o \
 	src/game/g_main.o \
