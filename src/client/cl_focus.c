@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "client.h"
 
-#define FOCUS_TIMESCALE		0.25f
+#define FOCUS_TIMESCALE		0.125f
 #define FOCUS_FOV			0.88f	/* slight FOV tighten while focused */
 #define FOCUS_RAMP			4.0f	/* ~250ms in and out */
 
@@ -121,11 +121,11 @@ void CL_InitFocus(void)
 	const char *b;
 
 	cl_focus = Cvar_Get("cl_focus", "1", CVAR_ARCHIVE);
-	cl_focus_scale_cvar = Cvar_Get("cl_focus_scale", "0.25", 0);
+	cl_focus_scale_cvar = Cvar_Get("cl_focus_scale", "0.125", 0);
 	cl_focus_fov = Cvar_Get("cl_focus_fov", "0.88", CVAR_ARCHIVE);
 
-	if (cl_focus_scale_cvar && cl_focus_scale_cvar->value > 0.27f && cl_focus_scale_cvar->value < 0.29f)
-		Cvar_Set("cl_focus_scale", "0.25");
+	if (cl_focus_scale_cvar && cl_focus_scale_cvar->value >= 0.24f && cl_focus_scale_cvar->value <= 0.29f)
+		Cvar_Set("cl_focus_scale", "0.125");
 
 	CL_FocusReset();
 

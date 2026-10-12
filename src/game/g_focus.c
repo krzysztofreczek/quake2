@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 
-#define FOCUS_TIMESCALE		0.25f	/* world/weapons/effects run at 1/4 speed */
+#define FOCUS_TIMESCALE		0.125f	/* world/effects run at 1/8 speed */
 #define FOCUS_RAMP			4.0f	/* ~250ms in and out at 10 Hz */
 
 static cvar_t *g_focus;
@@ -30,7 +30,9 @@ static cvar_t *g_focus_scale;
 void G_InitFocus(void)
 {
 	g_focus = gi.cvar("g_focus", "1", 0);
-	g_focus_scale = gi.cvar("g_focus_scale", "0.25", 0);
+	g_focus_scale = gi.cvar("g_focus_scale", "0.125", 0);
+	if (g_focus_scale->value >= 0.24f && g_focus_scale->value <= 0.29f)
+		g_focus_scale = gi.cvar_set("g_focus_scale", "0.125");
 	level.frametime = FRAMETIME;
 	level.focus_scale = 1.0f;
 	level.focus_frac = 0.0f;
