@@ -23,6 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define FOCUS_TIMESCALE		0.125f	/* world/effects run at 1/8 speed */
 #define FOCUS_RAMP			4.0f	/* ~250ms in and out at 10 Hz */
+#define FOCUS_CHARGE_TIME	30.0f	/* seconds to fill an empty battery */
+#define FOCUS_DRAIN_TIME	15.0f	/* seconds of focus from a full battery */
 
 static cvar_t *g_focus;
 static cvar_t *g_focus_scale;
@@ -38,6 +40,69 @@ void G_InitFocus(void)
 	level.focus_frac = 0.0f;
 }
 
+static void G_RunFocusBattery(edict_t *ent)
+{
+	gclient_t *client = ent->client;
+	float dt = FRAMETIME;
+
+	if (!client)
+		return;
+
+	if (ent->health <= 0 || client->resp.spectator || level.intermissiontime) {
+		client->focus_active = false;
+		return;
+	}
+
+	if (client->focus_active) {
+		if (!client->focus_held) {
+			client->focus_active = false;
+		} else {
+			client->pers.focus_battery -= dt / FOCUS_DRAIN_TIME;
+			if (client->pers.focus_battery <= 0.0f) {
+				client->pers.focus_battery = 0.0f;
+				client->focus_active = false;
+			}
+		}
+	}
+
+	if (!client->focus_active) {
+		client->pers.focus_battery += dt / FOCUS_CHARGE_TIME;
+		if (client->pers.focus_battery > 1.0f)
+			client->pers.focus_battery = 1.0f;
+
+		if (g_focus && g_focus->value && client->focus_held && client->pers.focus_battery >= 1.0f)
+			client->focus_active = true;
+	}
+}
+
+qboolean G_FocusEnabled(void)
+{
+	return g_focus && g_focus->value;
+}
+
+int G_FocusHudSeconds(gclient_t *client)
+{
+	float battery;
+	int seconds;
+
+	if (!client)
+		return 0;
+
+	battery = client->pers.focus_battery;
+	if (client->focus_active)
+		seconds = (int)(battery * FOCUS_DRAIN_TIME + 0.999f);
+	else if (battery >= 1.0f)
+		seconds = (int)FOCUS_DRAIN_TIME;
+	else
+		seconds = (int)((1.0f - battery) * FOCUS_CHARGE_TIME + 0.999f);
+
+	if (seconds < 0)
+		seconds = 0;
+	else if (seconds > 99)
+		seconds = 99;
+	return seconds;
+}
+
 void G_UpdateFocus(void)
 {
 	qboolean wanted = false;
@@ -48,16 +113,14 @@ void G_UpdateFocus(void)
 	if (!g_focus)
 		G_InitFocus();
 
-	if (g_focus->value && !level.intermissiontime) {
-		for (i = 1; i <= game.maxclients; i++) {
-			ent = &g_edicts[i];
-			if (!ent->inuse || !ent->client || ent->health <= 0 || ent->client->resp.spectator)
-				continue;
-			if (ent->client->focus_held) {
-				wanted = true;
-				break;
-			}
-		}
+	for (i = 1; i <= game.maxclients; i++) {
+		ent = &g_edicts[i];
+		if (!ent->inuse || !ent->client)
+			continue;
+		G_RunFocusBattery(ent);
+		if (g_focus->value && !level.intermissiontime && ent->health > 0
+			&& !ent->client->resp.spectator && ent->client->focus_active)
+			wanted = true;
 	}
 
 	target = wanted ? 1.0f : 0.0f;

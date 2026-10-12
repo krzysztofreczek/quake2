@@ -520,6 +520,19 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_HELPICON] = 0;
 
 	ent->client->ps.stats[STAT_SPECTATOR] = 0;
+
+	//
+	// focus battery
+	//
+	if (G_FocusEnabled()) {
+		ent->client->ps.stats[STAT_FOCUS] = G_FocusHudSeconds(ent->client);
+		ent->client->ps.stats[STAT_FOCUS_ICON] = level.pic_focus;
+		ent->client->ps.stats[STAT_FOCUS_ON] = ent->client->focus_active ? 1 : 0;
+	} else {
+		ent->client->ps.stats[STAT_FOCUS] = 0;
+		ent->client->ps.stats[STAT_FOCUS_ICON] = 0;
+		ent->client->ps.stats[STAT_FOCUS_ON] = 0;
+	}
 }
 
 /*

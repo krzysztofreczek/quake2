@@ -704,6 +704,18 @@ char *single_statusbar =
 "	xv	148 "
 "	pic	11 "
 "endif "
+
+// focus battery (top left)
+"if 19 "
+"	yt	4 "
+"	xl	2 "
+"	string2 \"FOCUS\" "
+"	yt	16 "
+"	xl	0 "
+"	num	2	18 "
+"	xl	32 "
+"	pic	19 "
+"endif "
 ;
 
 char *dm_statusbar =
@@ -761,6 +773,18 @@ char *dm_statusbar =
 "if 11 "
 "	xv	148 "
 "	pic	11 "
+"endif "
+
+// focus battery (top left)
+"if 19 "
+"	yt	4 "
+"	xl	2 "
+"	string2 \"FOCUS\" "
+"	yt	16 "
+"	xl	0 "
+"	num	2	18 "
+"	xl	32 "
+"	pic	19 "
 "endif "
 
 //  frags
@@ -850,6 +874,7 @@ void SP_worldspawn (edict_t *ent)
 	// help icon for statusbar
 	gi.imageindex ("i_help");
 	level.pic_health = gi.imageindex ("i_health");
+	level.pic_focus = gi.imageindex ("p_adrenaline");
 	gi.imageindex ("help");
 	gi.imageindex ("field_3");
 

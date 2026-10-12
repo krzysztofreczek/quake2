@@ -627,6 +627,7 @@ void InitClientPersistant (gclient_t *client)
 	client->pers.max_slugs		= 50;
 
 	client->pers.connected = true;
+	client->pers.focus_battery = 1.0f;
 }
 
 

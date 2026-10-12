@@ -342,6 +342,7 @@ typedef struct
 	float		frametime;			// physics dt (FRAMETIME * focus_scale)
 	float		focus_frac;			// 0 = normal, 1 = full focus
 	float		focus_scale;		// world timescale
+	int			pic_focus;
 } level_locals_t;
 
 
@@ -814,6 +815,8 @@ void G_RunEntity (edict_t *ent);
 //
 void G_InitFocus (void);
 void G_UpdateFocus (void);
+qboolean G_FocusEnabled (void);
+int G_FocusHudSeconds (gclient_t *client);
 
 //
 // g_main.c
@@ -877,6 +880,8 @@ typedef struct
 	int			helpchanged;
 
 	qboolean	spectator;			// client is a spectator
+
+	float		focus_battery;		// 0 = empty, 1 = full (15s of focus)
 } client_persistant_t;
 
 // client data that stays across deathmatch respawns
@@ -976,6 +981,7 @@ struct gclient_s
 	qboolean	update_chase;		// need to update chase info?
 
 	qboolean	focus_held;
+	qboolean	focus_active;
 };
 
 

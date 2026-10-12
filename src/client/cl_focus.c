@@ -49,6 +49,8 @@ static qboolean Focus_IsHeld(void)
 		return false;
 	if (cl.frame.playerstate.pmove.pm_type != PM_NORMAL)
 		return false;
+	if (!cl.frame.playerstate.stats[STAT_FOCUS_ON])
+		return false;
 	return (in_focus.state & 1) != 0;
 }
 
