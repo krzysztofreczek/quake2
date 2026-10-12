@@ -428,7 +428,7 @@ static void R_DrawNullModel (void)
 R_DrawEntitiesOnList
 =============
 */
-static void R_DrawEntitiesOnList (void)
+void R_DrawEntitiesOnList (void)
 {
 	model_t	*model;
 	entity_t *lastE, *transE = NULL;
@@ -440,6 +440,8 @@ static void R_DrawEntitiesOnList (void)
 	// draw non-transparent first
 	for (currententity = r_newrefdef.entities; currententity != lastE; currententity++)
 	{
+		if (currententity->flags & RF_VIEWERMODEL)
+			continue;
 		if (currententity->flags & RF_TRANSLUCENT) {
 			if(!transE)
 				transE = currententity;
@@ -482,6 +484,8 @@ static void R_DrawEntitiesOnList (void)
 	qglDepthMask (GL_FALSE);		// no z writes
 	for (currententity = transE; currententity != lastE; currententity++)
 	{
+		if (currententity->flags & RF_VIEWERMODEL)
+			continue;
 		if (!(currententity->flags & RF_TRANSLUCENT))
 			continue;	// solid
 
@@ -1028,20 +1032,24 @@ static void R_RenderView (refdef_t *fd)
 
 	R_MarkLeaves();	// done here so we know if we're in water
 
-	R_DrawWorld();
+	if (R_RayTraceFrame()) {
+		/* world replaced by the CPU path tracer */
+	} else {
+		R_DrawWorld();
 
-	R_AddDecals(); //Decals
+		R_AddDecals(); //Decals
 
-	R_DrawEntitiesOnList();
-	
-	R_RenderDlights();
+		R_DrawEntitiesOnList();
+		
+		R_RenderDlights();
 
-	GL_InitArrays();
+		GL_InitArrays();
 
-	if (r_newrefdef.num_particles)
-		R_DrawParticles();
+		if (r_newrefdef.num_particles)
+			R_DrawParticles();
 
-	R_DrawAlphaSurfaces();
+		R_DrawAlphaSurfaces();
+	}
 
 //	R_PolyBlend();
 
@@ -1480,6 +1488,8 @@ static void GL_Register( void )
 	r_customheight->OnChange = OnChangeCustomHeight;
 	OnChangeCustomWidth(r_customwidth, r_customwidth->resetString);
 	OnChangeCustomHeight(r_customheight, r_customheight->resetString);
+
+	R_RayInit();
 
 	if( gl_scale->value < 1.0f )
 		Cvar_Set( "gl_scale", "1.0" );
@@ -2048,6 +2058,7 @@ R_Shutdown
 */
 void R_Shutdown (void)
 {	
+	R_RayShutdown();
 	R_ShutdownModels();
 
 	GL_ShutdownImages();

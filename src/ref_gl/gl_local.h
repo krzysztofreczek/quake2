@@ -121,6 +121,7 @@ typedef struct image_s
 
 	int		flags;
 	struct image_s	*hashNext;
+	byte	*pixels;					// RGB8 CPU copy for the raytracer
 } image_t;
 
 #define MAX_TEXTURE_UNITS	2
@@ -326,6 +327,7 @@ void	R_Shutdown( void );
 void GL_ScreenShot_f (void);
 void R_DrawAliasModel (model_t *model);
 void R_DrawBrushModel (bspSubmodel_t *subModel);
+void R_DrawEntitiesOnList (void);
 //void R_DrawSpriteModel (void);
 void R_DrawBeam( void );
 void R_DrawWorld (void);
@@ -359,6 +361,11 @@ void	Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 void	R_BeginFrame( float camera_separation );
 void	R_SwapBuffers( int );
 void	R_CinematicSetPalette ( const unsigned char *palette);
+
+void		R_RayInit(void);
+void		R_RayShutdown(void);
+qboolean	R_RayTraceActive(void);
+qboolean	R_RayTraceFrame(void);
 
 void	Draw_GetPalette (void);
 

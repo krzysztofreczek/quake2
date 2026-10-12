@@ -491,6 +491,7 @@ static void Mod_LoadTexinfo (const lump_t *l)
 		out->vecs[1][3] = LittleFloat (in->vecs[1][3]);
 
 		out->flags = LittleLong (in->flags);
+		out->value = LittleLong (in->value);
 		next = LittleLong (in->nexttexinfo);
 		if (next > 0)
 			out->next = loadmodel->bspModel->texinfo + next;

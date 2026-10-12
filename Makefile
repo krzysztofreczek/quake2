@@ -17,10 +17,11 @@ ifneq ($(PLATFORM),linux)
 endif
 
 CC=gcc
-CFLAGS=-funsigned-char -pipe $(shell sdl2-config --cflags) -DGL_QUAKE -DUSE_SDL -DUSE_CURL
+CFLAGS=-funsigned-char -pipe $(shell sdl2-config --cflags) -DGL_QUAKE -DUSE_SDL -DUSE_CURL -pthread
 
 ifeq ($(PLATFORM),darwin)
-	CFLAGS += -D__APPLE__ -I/opt/local/include
+	CFLAGS += -D__APPLE__ -I/opt/homebrew/include -I/opt/local/include
+	LDFLAGS += -L/opt/homebrew/lib -L/opt/local/lib
 endif
 
 DEBUG_CFLAGS=$(CFLAGS) -g -Wall
@@ -34,7 +35,7 @@ endif
 
 LDFLAGS += $(shell sdl2-config --libs)
 LDFLAGS += $(shell curl-config --libs)
-LDFLAGS += -ljpeg -lpng -lz
+LDFLAGS += -ljpeg -lpng -lz -pthread
 
 all: debug
 
@@ -123,6 +124,7 @@ QUAKE2_OBJS = \
 	src/ref_gl/gl_light.o \
 	src/ref_gl/gl_mesh.o \
 	src/ref_gl/gl_model.o \
+	src/ref_gl/gl_ray.o \
 	src/ref_gl/gl_rmain.o \
 	src/ref_gl/gl_rmisc.o \
 	src/ref_gl/gl_rsurf.o \
@@ -154,6 +156,7 @@ QUAKE2_OBJS = \
 	src/ui/ui_newoptions.o \
 	src/ui/ui_playerconfig.o \
 	src/ui/ui_quit.o \
+	src/ui/ui_raytrace.o \
 	src/ui/ui_startserver.o \
 	src/ui/ui_video.o
 

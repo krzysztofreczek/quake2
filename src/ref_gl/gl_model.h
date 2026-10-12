@@ -64,6 +64,7 @@ typedef struct mtexinfo_s
 {
 	float		vecs[2][4];
 	int			flags;
+	int			value;			// SURF_LIGHT emission strength
 	int			numframes;
 	struct mtexinfo_s	*next;		// animation chain
 	image_t		*image;

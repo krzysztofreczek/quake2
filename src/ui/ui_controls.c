@@ -36,6 +36,7 @@ static menuframework_s	s_options_menu;
 static menuaction_s		s_options_defaults_action;
 static menuaction_s		s_options_customize_options_action;
 static menuaction_s		s_options_new_options_action;
+static menuaction_s		s_options_raytrace_action;
 static menuaction_s		s_options_demos_action;
 #if defined(_WIN32) || defined(WITH_XMMS)
 static menuaction_s		s_options_mp3_action;
@@ -79,6 +80,11 @@ static void CustomizeControlsFunc( void *unused )
 static void NewOptionsFunc( void *unused )
 {
 	M_Menu_NewOptions_f();
+}
+
+static void RaytraceOptionsFunc( void *unused )
+{
+	M_Menu_Raytrace_f();
 }
 
 static void DemosFunc( void *unused )
@@ -435,6 +441,13 @@ void Options_MenuInit( void )
 	s_options_new_options_action.generic.name	= "new options";
 	s_options_new_options_action.generic.callback = NewOptionsFunc;
 
+	s_options_raytrace_action.generic.type	= MTYPE_ACTION;
+	s_options_raytrace_action.generic.x		= 0;
+	s_options_raytrace_action.generic.y		= y += 10;
+	s_options_raytrace_action.generic.name	= "raytracing";
+	s_options_raytrace_action.generic.callback = RaytraceOptionsFunc;
+	s_options_raytrace_action.generic.statusbar = "Path tracer quality, lighting, and performance";
+
 	s_options_demos_action.generic.type	= MTYPE_ACTION;
 	s_options_demos_action.generic.x		= 0;
 	s_options_demos_action.generic.y		= y += 10;
@@ -489,6 +502,7 @@ void Options_MenuInit( void )
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_joystick_box );
 #endif
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_new_options_action );
+	Menu_AddItem( &s_options_menu, ( void * ) &s_options_raytrace_action );
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_demos_action );
 #if defined(_WIN32) || defined(WITH_XMMS)
 	Menu_AddItem( &s_options_menu, ( void * ) &s_options_mp3_action );

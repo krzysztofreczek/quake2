@@ -194,6 +194,7 @@ void M_Menu_Main_f (void);
 		void M_Menu_StartServer_f (void);
 			void M_Menu_DMOptions_f (void);
 	void M_Menu_Video_f (void);
+		void M_Menu_Raytrace_f (void);
 	void M_Menu_Options_f (void);
 		void M_Menu_NewOptions_f (void);
 		void M_Menu_Demos_f( void );

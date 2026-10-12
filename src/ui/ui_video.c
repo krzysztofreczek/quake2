@@ -66,6 +66,7 @@ static menuslider_s		s_brightness_slider;
 static menulist_s  		s_fs_box;
 static menulist_s  		s_stipple_box;
 static menulist_s  		s_finish_box;
+static menuaction_s		s_raytrace_action;
 static menuaction_s		s_defaults_action;
 static menuaction_s		s_apply_action;
 
@@ -90,6 +91,11 @@ static void BrightnessCallback( void *s )
 
 	Cvar_SetValue( "vid_gamma", gamma );
 #endif
+}
+
+static void RaytraceMenu( void *unused )
+{
+	M_Menu_Raytrace_f();
 }
 
 static void ResetDefaults( void *unused )
@@ -292,16 +298,23 @@ void VID_MenuInit( void )
 	s_fs_box.itemnames = yesno_names;
 	s_fs_box.curvalue = vid_fullscreen->integer;
 
+	s_raytrace_action.generic.type = MTYPE_ACTION;
+	s_raytrace_action.generic.name = "raytracing...";
+	s_raytrace_action.generic.x    = 0;
+	s_raytrace_action.generic.y    = 90;
+	s_raytrace_action.generic.callback = RaytraceMenu;
+	s_raytrace_action.generic.statusbar = "Path tracer quality, lighting, and performance";
+
 	s_defaults_action.generic.type = MTYPE_ACTION;
 	s_defaults_action.generic.name = "reset to defaults";
 	s_defaults_action.generic.x    = 0;
-	s_defaults_action.generic.y    = 90;
+	s_defaults_action.generic.y    = 100;
 	s_defaults_action.generic.callback = ResetDefaults;
 
 	s_apply_action.generic.type = MTYPE_ACTION;
 	s_apply_action.generic.name = "apply";
 	s_apply_action.generic.x    = 0;
-	s_apply_action.generic.y    = 100;
+	s_apply_action.generic.y    = 110;
 	s_apply_action.generic.callback = ApplyChanges;
 
 #ifndef GL_QUAKE
@@ -344,6 +357,7 @@ void VID_MenuInit( void )
 	Menu_AddItem( &s_video_menu, ( void * ) &s_fs_box );
 	Menu_AddItem( &s_video_menu, ( void * ) &s_tq_slider );
 	Menu_AddItem( &s_video_menu, ( void * ) &s_finish_box );
+	Menu_AddItem( &s_video_menu, ( void * ) &s_raytrace_action );
 #endif
 
 	Menu_AddItem( &s_video_menu, ( void * ) &s_defaults_action );

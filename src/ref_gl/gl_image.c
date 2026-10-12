@@ -1806,6 +1806,36 @@ image_t *GL_LoadPic (const char *name, byte *pic, int width, int height, imagety
 	image->sl = image->tl = 0;
 	image->sh = image->th = 1;
 
+	{
+		int n = width * height;
+		int i;
+		byte *out;
+
+		if (image->pixels) {
+			Z_Free(image->pixels);
+			image->pixels = NULL;
+		}
+		if (n > 0 && n <= 4096 * 4096) {
+			out = Z_TagMalloc(n * 3, TAG_RENDER_IMAGE);
+			if (flags & IT_PALETTED) {
+				for (i = 0; i < n; i++) {
+					unsigned c = d_8to24table[pic[i]];
+					out[i * 3 + 0] = (byte)(c & 255);
+					out[i * 3 + 1] = (byte)((c >> 8) & 255);
+					out[i * 3 + 2] = (byte)((c >> 16) & 255);
+				}
+			} else {
+				int stride = (samples == 3) ? 3 : 4;
+				for (i = 0; i < n; i++) {
+					out[i * 3 + 0] = pic[i * stride + 0];
+					out[i * 3 + 1] = pic[i * stride + 1];
+					out[i * 3 + 2] = pic[i * stride + 2];
+				}
+			}
+			image->pixels = out;
+		}
+	}
+
 	return image;
 }
 
@@ -2056,6 +2086,8 @@ void GL_FreeUnusedImages (void)
 		// free it
 		if( !(image->flags & IT_SCRAP) )
 			qglDeleteTextures (1, (GLuint *)&image->texnum);
+		if (image->pixels)
+			Z_Free(image->pixels);
 
 		memset (image, 0, sizeof(*image));
 	}
@@ -2244,6 +2276,8 @@ void GL_ShutdownImages (void)
 		// free it
 		if( !(image->flags & IT_SCRAP) )
 			qglDeleteTextures (1, (GLuint *)&image->texnum);
+		if (image->pixels)
+			Z_Free(image->pixels);
 	}
 	if (scrap_uploaded) {
 		i = TEXNUM_SCRAPS;

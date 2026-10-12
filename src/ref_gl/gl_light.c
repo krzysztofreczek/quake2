@@ -312,13 +312,15 @@ void R_LightPoint (const vec3_t p, vec3_t color)
 		VectorCopy (pointcolor, color);
 
 	// add dynamic lights
-	dl = r_newrefdef.dlights;
-	for (lnum = 0; lnum < r_newrefdef.num_dlights; lnum++, dl++)
-	{
-		add = dl->intensity - (float)Distance(currententity->origin, dl->origin);
-		if (add > 0.0f) {
-			add *= ONEDIV256;
-			VectorMA (color, add, dl->color, color);
+	if (currententity) {
+		dl = r_newrefdef.dlights;
+		for (lnum = 0; lnum < r_newrefdef.num_dlights; lnum++, dl++)
+		{
+			add = dl->intensity - (float)Distance(currententity->origin, dl->origin);
+			if (add > 0.0f) {
+				add *= ONEDIV256;
+				VectorMA (color, add, dl->color, color);
+			}
 		}
 	}
 

@@ -384,6 +384,7 @@ void M_Init (void)
 		Cmd_AddCommand ("menu_credits", M_Menu_Credits_f );
 	Cmd_AddCommand ("menu_multiplayer", M_Menu_Multiplayer_f );
 	Cmd_AddCommand ("menu_video", M_Menu_Video_f);
+		Cmd_AddCommand ("menu_raytrace", M_Menu_Raytrace_f);
 	Cmd_AddCommand ("menu_options", M_Menu_Options_f);
 		Cmd_AddCommand ("menu_newoptions", M_Menu_NewOptions_f);
 		Cmd_AddCommand ("menu_keys", M_Menu_Keys_f);
