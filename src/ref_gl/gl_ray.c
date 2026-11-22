@@ -1901,35 +1901,35 @@ static void RT_ShadeLuxel(msurface_t *surf, int s, int t, vec3_t lighting)
 	}
 
 	/*
-	 * Contrast like path-trace sky spill, but stable:
-	 * open-to-sky luxels get warm/red sky add; occluded keep more bake.
+	 * Strong sky spill through roof holes (path-trace-like), still stable.
+	 * Open luxels get a large sky add; occluded areas keep more of the bake.
 	 */
 	gain = (rt_skylight && rt_skylight->value > 0.0f) ? rt_skylight->value : 2.4f;
-	keep = 0.40f + 0.45f * vis; /* more sky → slightly more bake retained too */
-	skyadd = 55.0f * mod * (gain / 2.4f);
+	keep = 0.28f + 0.35f * vis;
+	skyadd = 110.0f * mod * (gain / 2.4f);
 	if (rt_lightscale && rt_lightscale->value > 0.1f)
 		skyadd *= rt_lightscale->value;
 
 	up[0] = 0.0f; up[1] = 0.0f; up[2] = 1.0f;
 	RT_SunDir(sun);
 	RT_SkyColor(up, scol);
-	lighting[0] = baked[0] * keep + vis * skyadd * (0.55f + 0.90f * scol[0]);
-	lighting[1] = baked[1] * keep + vis * skyadd * (0.40f + 0.70f * scol[1]);
-	lighting[2] = baked[2] * keep + vis * skyadd * (0.30f + 0.55f * scol[2]);
-	/* Soft sun contribution */
+	lighting[0] = baked[0] * keep + vis * skyadd * (0.70f + 1.10f * scol[0]);
+	lighting[1] = baked[1] * keep + vis * skyadd * (0.45f + 0.85f * scol[1]);
+	lighting[2] = baked[2] * keep + vis * skyadd * (0.28f + 0.55f * scol[2]);
+	/* Soft sun / bright sky direction */
 	RT_SkyColor(sun, scol);
-	lighting[0] += vis * skyadd * 0.25f * scol[0];
-	lighting[1] += vis * skyadd * 0.22f * scol[1];
-	lighting[2] += vis * skyadd * 0.16f * scol[2];
+	lighting[0] += vis * skyadd * 0.45f * scol[0];
+	lighting[1] += vis * skyadd * 0.35f * scol[1];
+	lighting[2] += vis * skyadd * 0.22f * scol[2];
 
 	VectorScale(lighting, ent, lighting);
 
-	/* Clamp fireflies / purple blowouts into lightmap range */
+	/* Allow brighter sky pools; still clamp extremes */
 	m = lighting[0];
 	if (lighting[1] > m) m = lighting[1];
 	if (lighting[2] > m) m = lighting[2];
-	if (m > 320.0f) {
-		float s = 320.0f / m;
+	if (m > 420.0f) {
+		float s = 420.0f / m;
 		lighting[0] *= s;
 		lighting[1] *= s;
 		lighting[2] *= s;
@@ -2052,7 +2052,7 @@ static void RT_InvalidateLightmapBakes(void)
 static void RT_UpdateLightmaps(void)
 {
 	int i, budget, scale, processed, baked_surfs, guard;
-	const int ALGO = 7; /* deterministic sky+bake middle path */
+	const int ALGO = 8; /* brighter sky spill into lightmaps */
 
 	if (!r_worldmodel)
 		return;
@@ -2060,7 +2060,7 @@ static void RT_UpdateLightmaps(void)
 	if (rt_lm_algo != ALGO) {
 		rt_lm_algo = ALGO;
 		RT_InvalidateLightmapBakes();
-		RT_RunLog("raytracer: rebaking lightmaps (algo %i, stable sky GI)\n", ALGO);
+		RT_RunLog("raytracer: rebaking lightmaps (algo %i, bright sky)\n", ALGO);
 	}
 
 	if (rt_light_world != r_worldmodel)
