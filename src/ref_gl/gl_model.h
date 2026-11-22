@@ -110,6 +110,12 @@ typedef struct msurface_s
 	byte		*samples;		// [numstyles*surfsize]
 	byte		*stain_samples;		// stainmapping
 
+	/* CPU raytracer lightmap cache (RGB floats, smax*tmax*3) */
+	float		*rt_light;
+	int			rt_light_size;
+	int			rt_dirty;
+	int			rt_baked;		/* surface fully processed once */
+
 	// Vic's awesome decals
 	int				fragmentframe;
 } msurface_t;

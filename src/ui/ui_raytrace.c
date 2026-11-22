@@ -64,13 +64,14 @@ static void RT_EnsureCvars(void)
 {
 	Cvar_Get("r_raytrace", "1", CVAR_ARCHIVE);
 	Cvar_Get("rt_mode", "0", CVAR_ARCHIVE);
-	Cvar_Get("rt_scale", "4", CVAR_ARCHIVE);
-	Cvar_Get("rt_bounces", "1", CVAR_ARCHIVE);
+	Cvar_Get("rt_scale", "2", CVAR_ARCHIVE);
+	Cvar_Get("rt_spp", "1", CVAR_ARCHIVE);
+	Cvar_Get("rt_bounces", "0", CVAR_ARCHIVE);
 	Cvar_Get("rt_accum", "1", CVAR_ARCHIVE);
 	Cvar_Get("rt_exposure", "2.6", CVAR_ARCHIVE);
 	Cvar_Get("rt_lightscale", "1.35", CVAR_ARCHIVE);
 	Cvar_Get("rt_skylight", "2.4", CVAR_ARCHIVE);
-	Cvar_Get("rt_reflect", "0.42", CVAR_ARCHIVE);
+	Cvar_Get("rt_reflect", "0", CVAR_ARCHIVE);
 	Cvar_Get("rt_threads", "0", CVAR_ARCHIVE);
 	Cvar_Get("rt_weapons", "1", CVAR_ARCHIVE);
 }
@@ -82,7 +83,12 @@ static void RT_SetMenuItemValues(void)
 	RT_EnsureCvars();
 
 	s_rt_enable_box.curvalue = Cvar_VariableIntValue("r_raytrace") != 0;
-	s_rt_mode_box.curvalue = Cvar_VariableIntValue("rt_mode") != 0;
+	{
+		int mode = Cvar_VariableIntValue("rt_mode");
+		if (mode < 0) mode = 0;
+		if (mode > 2) mode = 2;
+		s_rt_mode_box.curvalue = mode;
+	}
 
 	scale = Cvar_VariableIntValue("rt_scale");
 	s_rt_quality_box.curvalue = RT_QualityFromScale(scale);
@@ -107,7 +113,16 @@ static void RT_EnableFunc(void *unused)
 
 static void RT_ModeFunc(void *unused)
 {
-	Cvar_SetValue("rt_mode", (float)s_rt_mode_box.curvalue);
+	int mode = s_rt_mode_box.curvalue;
+	if (mode < 0) mode = 0;
+	if (mode > 2) mode = 2;
+	Cvar_SetValue("rt_mode", (float)mode);
+	/* Path-trace needs a usable resolution; low quality was scale 8 → 160px */
+	if (mode >= 2 && Cvar_VariableIntValue("rt_scale") >= 6)
+		Cvar_SetValue("rt_scale", 2);
+	/* Hybrid raytracing: enable a mild reflection overlay if none set */
+	if (mode == 1 && Cvar_VariableValue("rt_reflect") < 0.15f)
+		Cvar_SetValue("rt_reflect", 0.35f);
 }
 
 static void RT_QualityFunc(void *unused)
@@ -192,7 +207,8 @@ static void RT_MenuInit(void)
 		0
 	};
 	static const char *mode_names[] = {
-		"hybrid",
+		"lightmaps",
+		"raytracing",
 		"path trace",
 		0
 	};
@@ -232,7 +248,7 @@ static void RT_MenuInit(void)
 	s_rt_enable_box.generic.name = "raytracing";
 	s_rt_enable_box.generic.callback = RT_EnableFunc;
 	s_rt_enable_box.itemnames = yesno_names;
-	s_rt_enable_box.generic.statusbar = "CPU BSP path tracer (Q2VKPT-style)";
+	s_rt_enable_box.generic.statusbar = "Master switch for all RT lighting modes";
 
 	s_rt_mode_box.generic.type = MTYPE_SPINCONTROL;
 	s_rt_mode_box.generic.x = 0;
@@ -240,7 +256,7 @@ static void RT_MenuInit(void)
 	s_rt_mode_box.generic.name = "lighting";
 	s_rt_mode_box.generic.callback = RT_ModeFunc;
 	s_rt_mode_box.itemnames = mode_names;
-	s_rt_mode_box.generic.statusbar = "Hybrid uses baked lightmaps; path trace samples lights";
+	s_rt_mode_box.generic.statusbar = "Lightmaps=fast GI bake; raytracing=+reflections; path=fullscreen";
 
 	s_rt_quality_box.generic.type = MTYPE_SPINCONTROL;
 	s_rt_quality_box.generic.x = 0;
@@ -248,7 +264,7 @@ static void RT_MenuInit(void)
 	s_rt_quality_box.generic.name = "quality";
 	s_rt_quality_box.generic.callback = RT_QualityFunc;
 	s_rt_quality_box.itemnames = quality_names;
-	s_rt_quality_box.generic.statusbar = "Internal resolution; higher is sharper and slower";
+	s_rt_quality_box.generic.statusbar = "Higher = sharper path-trace / faster lightmap bake";
 
 	s_rt_bounces_box.generic.type = MTYPE_SPINCONTROL;
 	s_rt_bounces_box.generic.x = 0;
@@ -273,7 +289,7 @@ static void RT_MenuInit(void)
 	s_rt_exposure_slider.generic.callback = RT_ExposureFunc;
 	s_rt_exposure_slider.minvalue = 8;
 	s_rt_exposure_slider.maxvalue = 50;
-	s_rt_exposure_slider.generic.statusbar = "Overall brightness of the path tracer";
+	s_rt_exposure_slider.generic.statusbar = "Brightness of reflections and path trace";
 
 	s_rt_lightscale_slider.generic.type = MTYPE_SLIDER;
 	s_rt_lightscale_slider.generic.x = 0;
@@ -282,7 +298,7 @@ static void RT_MenuInit(void)
 	s_rt_lightscale_slider.generic.callback = RT_LightscaleFunc;
 	s_rt_lightscale_slider.minvalue = 5;
 	s_rt_lightscale_slider.maxvalue = 30;
-	s_rt_lightscale_slider.generic.statusbar = "Baked lightmap intensity on floors and walls";
+	s_rt_lightscale_slider.generic.statusbar = "RT lightmap intensity on floors and walls";
 
 	s_rt_skylight_slider.generic.type = MTYPE_SLIDER;
 	s_rt_skylight_slider.generic.x = 0;
@@ -291,7 +307,7 @@ static void RT_MenuInit(void)
 	s_rt_skylight_slider.generic.callback = RT_SkylightFunc;
 	s_rt_skylight_slider.minvalue = 0;
 	s_rt_skylight_slider.maxvalue = 50;
-	s_rt_skylight_slider.generic.statusbar = "Sun and window light on surfaces";
+	s_rt_skylight_slider.generic.statusbar = "Sun and window light baked into lightmaps";
 
 	s_rt_reflect_slider.generic.type = MTYPE_SLIDER;
 	s_rt_reflect_slider.generic.x = 0;
@@ -300,7 +316,7 @@ static void RT_MenuInit(void)
 	s_rt_reflect_slider.generic.callback = RT_ReflectFunc;
 	s_rt_reflect_slider.minvalue = 0;
 	s_rt_reflect_slider.maxvalue = 10;
-	s_rt_reflect_slider.generic.statusbar = "Glossy reflections on floors and walls";
+	s_rt_reflect_slider.generic.statusbar = "0=off; set above 2 to force noisy screen reflections";
 
 	s_rt_threads_box.generic.type = MTYPE_SPINCONTROL;
 	s_rt_threads_box.generic.x = 0;
@@ -316,7 +332,7 @@ static void RT_MenuInit(void)
 	s_rt_weapons_box.generic.name = "view weapon";
 	s_rt_weapons_box.generic.callback = RT_WeaponsFunc;
 	s_rt_weapons_box.itemnames = yesno_names;
-	s_rt_weapons_box.generic.statusbar = "Draw the first-person gun over the trace";
+	s_rt_weapons_box.generic.statusbar = "Draw the first-person gun (path trace mode)";
 
 	s_rt_defaults_action.generic.type = MTYPE_ACTION;
 	s_rt_defaults_action.generic.x = 0;

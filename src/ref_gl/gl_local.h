@@ -307,6 +307,8 @@ void GL_SelectTexture( int tmu );
 
 void R_LightPoint (const vec3_t p, vec3_t color);
 void R_PushDlights (void);
+void R_BuildLightMap (const msurface_t *surf, byte *dest, int stride);
+void R_SetCacheState (msurface_t *surf);
 
 //====================================================================
 
@@ -366,6 +368,12 @@ void		R_RayInit(void);
 void		R_RayShutdown(void);
 qboolean	R_RayTraceActive(void);
 qboolean	R_RayTraceFrame(void);
+void		R_RayPostFrame(void);
+qboolean	R_RayLightmapMode(void);
+qboolean	R_RayPathMode(void);
+void		R_RayApplySurfaceLight(const msurface_t *surf, float *blocklights, int size);
+qboolean	R_RaySoftDlights(const msurface_t *surf, float *blocklights);
+void		R_SampleSkyColor(const vec3_t dir, vec3_t out);
 
 void	Draw_GetPalette (void);
 

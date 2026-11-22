@@ -354,11 +354,15 @@ static void R_RenderBrushPoly (msurface_t *fa)
 			goto dynamic;
 	}
 
+	/* Raytraced lightmap cache needs a GPU upload */
+	if ( fa->rt_dirty )
+		goto dynamic;
+
 	// dynamic this frame or dynamic previously
 	if ( fa->dlightframe == r_framecount )
 	{
 dynamic:
-		if ( gl_dynamic->integer )
+		if ( gl_dynamic->integer || fa->rt_dirty )
 		{
 			if (!( fa->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP ) ) )
 				is_dynamic = true;
@@ -377,6 +381,7 @@ dynamic:
 
 			R_BuildLightMap( fa, (void *)temp, smax*4 );
 			R_SetCacheState( fa );
+			fa->rt_dirty = 0;
 
 			GL_Bind( gl_state.lightmap_textures + fa->lightmaptexturenum );
 
@@ -635,11 +640,14 @@ static void GL_RenderLightmappedPoly( msurface_t *surf )
 			goto dynamic;
 	}
 
+	if ( surf->rt_dirty )
+		goto dynamic;
+
 	// dynamic this frame or dynamic previously
 	if ( surf->dlightframe == r_framecount )
 	{
 dynamic:
-		if ( gl_dynamic->integer )
+		if ( gl_dynamic->integer || surf->rt_dirty )
 		{
 			if ( !(surf->texinfo->flags & (SURF_SKY|SURF_TRANS33|SURF_TRANS66|SURF_WARP ) ) )
 				is_dynamic = true;
@@ -655,6 +663,7 @@ dynamic:
 		tmax = (surf->extents[1]>>4)+1;
 
 		R_BuildLightMap( surf, (void *)temp, smax*4 );
+		surf->rt_dirty = 0;
 
 		if ( ( surf->styles[map] >= 32 || surf->styles[map] == 0 ) && ( surf->dlightframe != r_framecount ) )
 		{

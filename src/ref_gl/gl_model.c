@@ -613,6 +613,10 @@ static void Mod_LoadFaces (const lump_t *l)
 		out->dlight_t = 0;
 		out->dlightframe = 0;
 		out->dlightbits = 0;
+		out->rt_light = NULL;
+		out->rt_light_size = 0;
+		out->rt_dirty = 0;
+		out->rt_baked = 0;
 
 		out->visframe = 0;
 

@@ -1033,7 +1033,7 @@ static void R_RenderView (refdef_t *fd)
 	R_MarkLeaves();	// done here so we know if we're in water
 
 	if (R_RayTraceFrame()) {
-		/* world replaced by the CPU path tracer */
+		/* world replaced by path tracer (rt_mode 2) */
 	} else {
 		R_DrawWorld();
 
@@ -1049,6 +1049,9 @@ static void R_RenderView (refdef_t *fd)
 			R_DrawParticles();
 
 		R_DrawAlphaSurfaces();
+
+		/* lightmap mode: glossy/water reflection overlay (sees entities) */
+		R_RayPostFrame();
 	}
 
 //	R_PolyBlend();

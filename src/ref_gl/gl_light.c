@@ -699,9 +699,15 @@ void R_BuildLightMap (const msurface_t *surf, byte *dest, int stride)
 		}
 	}
 
+	/* Raytraced lightmap cache blends over baked styles */
+	if (R_RayLightmapMode())
+		R_RayApplySurfaceLight(surf, s_blocklights, size);
+
 // add all the dynamic lights
-	if (surf->dlightframe == r_framecount)
-		R_AddDynamicLights (surf);
+	if (surf->dlightframe == r_framecount) {
+		if (!R_RayLightmapMode() || !R_RaySoftDlights(surf, s_blocklights))
+			R_AddDynamicLights (surf);
+	}
 
 // put into texture format
 store:

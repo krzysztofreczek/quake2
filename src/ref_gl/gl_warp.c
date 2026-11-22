@@ -523,6 +523,69 @@ void R_SetSky (const char *name, float rotate, vec3_t axis)
 	}
 }
 
+/*
+============
+R_SampleSkyColor
+
+CPU sample of the loaded skybox for the raytracer (red unit1 sky, etc).
+============
+*/
+void R_SampleSkyColor (const vec3_t dir, vec3_t out)
+{
+	vec3_t	v, av;
+	float	s, t, dv;
+	int		axis, j, x, y, w, h;
+	image_t	*img;
+	const byte *pix;
+	static const int skytexorder[6] = {0, 2, 1, 3, 4, 5};
+
+	VectorCopy (dir, v);
+	if (VectorNormalize (v) < 1e-4f) {
+		VectorSet (out, 0.55f, 0.58f, 0.62f);
+		return;
+	}
+
+	VectorSet (av, (float)fabs(v[0]), (float)fabs(v[1]), (float)fabs(v[2]));
+	if (av[0] > av[1] && av[0] > av[2])
+		axis = (v[0] < 0.0f) ? 1 : 0;
+	else if (av[1] > av[2] && av[1] > av[0])
+		axis = (v[1] < 0.0f) ? 3 : 2;
+	else
+		axis = (v[2] < 0.0f) ? 5 : 4;
+
+	j = vec_to_st[axis][2];
+	dv = (j > 0) ? v[j - 1] : -v[-j - 1];
+	if ((float)fabs(dv) < 1e-4f) {
+		VectorSet (out, 0.55f, 0.58f, 0.62f);
+		return;
+	}
+	j = vec_to_st[axis][0];
+	s = ((j < 0) ? -v[-j - 1] : v[j - 1]) / dv;
+	j = vec_to_st[axis][1];
+	t = ((j < 0) ? -v[-j - 1] : v[j - 1]) / dv;
+
+	s = (s + 1.0f) * 0.5f;
+	t = 1.0f - (t + 1.0f) * 0.5f;
+	if (s < 0.0f) s = 0.0f;
+	if (s > 1.0f) s = 1.0f;
+	if (t < 0.0f) t = 0.0f;
+	if (t > 1.0f) t = 1.0f;
+
+	img = sky_images[skytexorder[axis]];
+	if (!img || !img->pixels || img->width < 1 || img->height < 1) {
+		VectorSet (out, 0.55f, 0.58f, 0.62f);
+		return;
+	}
+	w = img->width;
+	h = img->height;
+	x = (int)(s * (w - 1));
+	y = (int)(t * (h - 1));
+	pix = img->pixels + (y * w + x) * 3;
+	out[0] = pix[0] * ONEDIV255;
+	out[1] = pix[1] * ONEDIV255;
+	out[2] = pix[2] * ONEDIV255;
+}
+
 //Water caustics
 void EmitCausticPolys (const glpoly_t *p)
 {

@@ -21,7 +21,8 @@ CFLAGS=-funsigned-char -pipe $(shell sdl2-config --cflags) -DGL_QUAKE -DUSE_SDL 
 
 ifeq ($(PLATFORM),darwin)
 	CFLAGS += -D__APPLE__ -I/opt/homebrew/include -I/opt/local/include
-	LDFLAGS += -L/opt/homebrew/lib -L/opt/local/lib
+	CXX=clang++
+	OBJCXXFLAGS=$(CFLAGS) -fobjc-arc -std=c++17
 endif
 
 DEBUG_CFLAGS=$(CFLAGS) -g -Wall
@@ -36,6 +37,11 @@ endif
 LDFLAGS += $(shell sdl2-config --libs)
 LDFLAGS += $(shell curl-config --libs)
 LDFLAGS += -ljpeg -lpng -lz -pthread
+
+ifeq ($(PLATFORM),darwin)
+	LDFLAGS += -L/opt/homebrew/lib -L/opt/local/lib
+	LDFLAGS += -framework Metal -framework Foundation -framework CoreFoundation -lobjc
+endif
 
 all: debug
 
@@ -160,10 +166,23 @@ QUAKE2_OBJS = \
 	src/ui/ui_startserver.o \
 	src/ui/ui_video.o
 
+ifeq ($(PLATFORM),darwin)
+QUAKE2_OBJS += src/ref_gl/gl_ray_gpu.o
+
+src/ref_gl/gl_ray_gpu.o : src/ref_gl/gl_ray_gpu.mm src/ref_gl/gl_ray_gpu.h src/ref_gl/gl_local.h
+	@mkdir -p $(shell dirname $@)
+	@echo " [OBJCXX] $(shell basename $@)"
+	@$(CXX) $(OBJCXXFLAGS) -o $@ -c $<
+endif
+
 # The game executable.
 bin/quake2 : $(QUAKE2_OBJS)
 	@echo "[LD] quake2"
+ifeq ($(PLATFORM),darwin)
+	@$(CXX) -o $@ $(QUAKE2_OBJS) $(LDFLAGS)
+else
 	@$(CC) -o $@ $(QUAKE2_OBJS) $(LDFLAGS)
+endif
 
 GAME_OBJS = \
 	src/game/g_ai.o \
